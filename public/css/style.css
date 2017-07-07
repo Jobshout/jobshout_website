@@ -1327,7 +1327,7 @@ height: 35px;
 .page-footer h1 { padding-left: 4% }
 ul.page-footer-list {
     list-style: none;
-    padding: 0px 10px;
+    padding: 0px;
 }
 ul.page-footer-list li {
     line-height: 35px;
