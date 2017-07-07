@@ -63,7 +63,7 @@ if (typeof fetch_type !== "undefined" && fetch_type!="" && fetch_type!="") {
 				<!--BSW 20120216 jquery to populate content on load / while page navigation-->
 				<div class="col-lg-3 ">
 					<div class="blog-side-item">
-						<div class="blog-post print_posts"></div>
+						<div class="blog-post print_posts" style="margin-bottom:10px;"></div>
 					</div>
         		</div>
 			</div>
@@ -103,7 +103,7 @@ function applyPagination(total_count,displayResultsNum){
    		paginationHtml+= '<li><a href="javascript:void(0)" href="'+currentLink+'">«</a></li>';
     } else {
         var prePage= currentPageNum-1;
-        paginationHtml+= '<li><a href="'+currentLink+'?page='+prePage+'"><</a></li>';
+        paginationHtml+= '<li><a href="'+currentLink+'?page='+prePage+'">«</a></li>';
     }
    											
    	var pmin=1;
@@ -118,7 +118,7 @@ function applyPagination(total_count,displayResultsNum){
     									
 	for (var i=pmin; i <= pmax; i++) {
     	if (i == currentPageNum) {
-        	paginationHtml+= '<li class="current"><a href="javascript:void(0)" >'+i+'</a></li>';
+        	paginationHtml+= '<li class="active"><a href="javascript:void(0)" >'+i+'</a></li>';
         } else if (i == 1) {
         	paginationHtml+= '<li><a href="'+currentLink+'" >'+i+'</a></li>';
         } else {

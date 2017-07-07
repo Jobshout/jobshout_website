@@ -121,6 +121,7 @@ function load_more(){
 	load_data();
 }
 	$.updateContent = function updateContent(type,html){
+		alert(html)
 		$('.ImageLoadingDiv').hide();
 		if(type=='site'){
 			$("#content-tab-1").append(html);
@@ -163,6 +164,7 @@ function load_more(){
 					totalNum=parseInt(html.total);
 				}
 				var contentHtml="";
+				if(html.aaData.length>0) {
 				$.each(html.aaData, function(i,row){
 					if(row.Code!=""){
 						contentHtml+='<h4><a href="/'+row.Code+'" title="'+row.Document+'">'+row.Document+'</a></h4>';
@@ -174,6 +176,9 @@ function load_more(){
                       	contentHtml+='</p>';
 					}
 				});
+				}else{
+					contentHtml='<div class="alert alert-danger">No search results found!</div>';
+				}
 				$.updateContent(typeStr,contentHtml);
 			}
 			if(end< totalNum){
