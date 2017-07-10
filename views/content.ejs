@@ -274,7 +274,7 @@ $(document).ready(function() {
 		}
 		xhrStatus=$.getJSON(jsonRow,function(html){
 			if(html.error){
-				$(".print_posts").html('No latest news available!');
+				$(".print_posts").html('<div class="alert alert-danger">No latest posts found!</div>');
 			}else{
 				
 				var contentHtml="";
@@ -283,6 +283,7 @@ $(document).ready(function() {
 				}else{
 					contentHtml+="<h3>Latest Blog Post</h3>";
 				}
+				if(html.aaData && html.aaData.length>0) {
 				$.each(html.aaData, function(i,row){
 					if(row.Code!=""){
 						var defaultImg="images/no-image.png";
@@ -300,6 +301,9 @@ $(document).ready(function() {
               			contentHtml+='</div>';
 					}
 				});
+				}else{
+					contentHtml+='<div class="alert alert-danger">No latest posts found!</div>';
+				}
 				$(".print_posts").html(contentHtml);
 			}
 		});
