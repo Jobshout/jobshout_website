@@ -52,21 +52,21 @@ if (homePageTokenData !== 'undefined' && homePageTokenData !== null && homePageT
               <ul class="nav nav-tabs nav-justified ">
               	<% if(homePageMarketingToken!=""){ %>
                 <li class="active">
-                  <a data-toggle="tab" href="#news">
+                  <a data-toggle="tab" href="#news" onclick="scrollToItem('news');">
                     Marketing
                   </a>
                 </li>
                 <% } %>
                 <% if(homePageDevToken!=""){ %>
                 <li>
-                  <a data-toggle="tab" href="#events">
+                  <a data-toggle="tab" href="#events" onclick="scrollToItem('events');">
                     Development
                   </a>
                 </li>
                 <% } %>
                 <% if(homePageBrandingToken!=""){ %>
                 <li class="">
-                  <a data-toggle="tab" href="#notice-board">
+                  <a data-toggle="tab" href="#notice-board" onclick="scrollToItem('notice-board');">
                     Branding
                   </a>
                 </li>
@@ -119,6 +119,10 @@ if (homePageTokenData !== 'undefined' && homePageTokenData !== null && homePageT
     <script src="js/superfish.js"></script>
     <script type="text/javascript" src="js/parallax-slider/jquery.cslider.js"></script>
     <script type="text/javascript">
+    	function scrollToItem(eventID){
+    		var scrollPos =  $("#"+eventID).offset().top;
+			$(window).scrollTop(scrollPos+30);
+    	}
 		$(function() {
 			$('#da-slider').cslider({
          	 	autoplay    : true,

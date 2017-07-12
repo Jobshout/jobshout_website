@@ -48,9 +48,14 @@ searchTerm=queryString;
     			<div class="panel-body">
               		<div class="tab-content tasi-tab">
     			<div id="tab-1">
-    				<div id="content-tab-1">
+    				 <div class="container demo">
+						<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+							<div id="content-tab-1">
+    					
+    						</div>
+						</div>
+					</div>
     				
-    				</div>
     				<div style="text-align:center;margin-top:20px;" >
 						<a id="site_display_more_btn" style="width: 60%; margin-bottom: 10px;display:none;" class="btn btn-primary display_more_btn" title="Load more" onclick="load_more()" href="javascript:void(0);">
 						Load more
@@ -62,9 +67,13 @@ searchTerm=queryString;
         		</div><!--End of Tab 1-->
 
     			<div id="tab-2">
-    				<div id="content-tab-2">
-    				
-    				</div>
+    				<div class="container demo">
+						<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+							<div id="content-tab-2">
+    					
+    						</div>
+						</div>
+					</div>
     				<div style="text-align:center;margin-top:20px;" >
 						<a id="blog_display_more_btn" style="width: 60%; margin-bottom: 10px;display:none;" class="btn btn-primary display_more_btn" title="Load more" onclick="load_more()" href="javascript:void(0);">
 						Load more
@@ -76,7 +85,13 @@ searchTerm=queryString;
    				</div><!--End of Tab 2-->    
 
     			<div id="tab-3">
-    				<div id="content-tab-3"></div>
+    				<div class="container demo">
+						<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+							<div id="content-tab-3">
+    					
+    						</div>
+						</div>
+					</div>
     				<div style="text-align:center;margin-top:20px;" >
 						<a id="news_display_more_btn" style="width: 60%; margin-bottom: 10px; display:none;" class="btn btn-primary display_more_btn" title="Load more" onclick="load_more()" href="javascript:void(0);">
 						Load more
@@ -149,7 +164,10 @@ function load_more(){
 		$('#typeText').attr('value',type);
 		load_data();
 	}
-	
+	function refreshAllAccordion(){
+		$('.panel-collapse').removeClass('collapse in');
+		$('.panel-collapse').addClass('collapse');
+	}
 	function load_data(){
 		$(".alert").remove();
 		totalNum=0;
@@ -166,13 +184,22 @@ function load_more(){
 				if(html.aaData.length>0) {
 				$.each(html.aaData, function(i,row){
 					if(row.Code!=""){
-						contentHtml+='<h4><a href="/'+row.Code+'" title="'+row.Document+'">'+row.Document+'</a></h4>';
-                      	contentHtml+='<p>';
-                      	var bodyStr=row.Body;
+						var addOpenClass='', bodyStr=row.Body;
                       	bodyStr=bodyStr.replace(/<\/?[^>]+(>|$)/g, "");
                       	bodyStr=bodyStr.substr(0, 250);
-                      	contentHtml+=bodyStr+'... <a href="/'+row.Code+'" title="'+row.Document+'">more</a>';
-                      	contentHtml+='</p>';
+                      	
+						contentHtml+='<div class="panel panel-default"><div class="panel-heading" role="tab" id="heading_'+row._id+'">';
+                		contentHtml+='<h4 class="panel-title">';
+                    	contentHtml+='<a  onClick="refreshAllAccordion();" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse_'+row._id+'" aria-expanded="true" aria-controls="collapse_'+row._id+'">';
+                        contentHtml+='<i class="more-less glyphicon glyphicon-plus"></i>'+row.Document+'</a>';
+               			contentHtml+='</h4>';
+            			contentHtml+='</div>';
+            			if(i==0){
+            				addOpenClass='in';
+            			}
+            			contentHtml+='<div id="collapse_'+row._id+'" class="panel-collapse collapse '+addOpenClass+'" role="tabpanel" aria-labelledby="heading_'+row._id+'">';
+                		contentHtml+='<div class="panel-body">'+bodyStr+'... <a href="/'+row.Code+'" title="'+row.Document+'"><em><strong>Read more</strong></em></a></div>';
+           				contentHtml+='</div></div>';
 					}
 				});
 				}else{
