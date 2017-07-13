@@ -131,48 +131,6 @@ metaDescriptionStr= document_details.MetaTagDescription;
   			 	<div class="blog-side-item">
             		<div class="blog-post print_posts"></div>
 
-            		<!--<div class="archive">
-              <h3>
-                Archive
-              </h3>
-              <ul class="list-unstyled">
-                <li>
-                  <a href="#">
-                    <i class="fa fa-angle-double-right pr-10">
-                    </i>
-                    May 2015
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i class="fa fa-angle-double-right pr-10">
-                    </i>
-                    April 2016
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i class="fa fa-angle-double-right pr-10">
-                    </i>
-                    March 2015
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i class="fa fa-angle-double-right pr-10">
-                    </i>
-                    February 2016
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i class="fa fa-angle-double-right pr-10">
-                    </i>
-                    January 2016
-                  </a>
-                </li>
-              </ul>
-            </div>-->
           		</div>
   			 </div>
   		</div></div>
@@ -196,6 +154,15 @@ metaDescriptionStr= document_details.MetaTagDescription;
 	  				if(document_details.Objects){
 	  				for(var i=0; i<document_details.Objects.length; i++){
 	  							if(document_details.Objects[i].status==1 || document_details.Objects[i].status=="1"){	%>
+	  							<%- document_details.Objects[i].content %>
+	  					<%		}
+	  						}	  					
+	  					}
+	  			} else {	 
+	  				if(document_details.Objects){
+	  				for(var i=0; i<document_details.Objects.length; i++){
+	  							if(document_details.Objects[i].status==1 || document_details.Objects[i].status=="1"){	%>
+	  							<h2><%- document_details.Objects[i].name %></h2>
 	  							<%- document_details.Objects[i].content %>
 	  					<%		}
 	  						}	  					

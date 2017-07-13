@@ -17,69 +17,6 @@ var initFunctions = require('../config/functions');
 module.exports = function(init, app, db){
 	var mongodb=init.mongodb;
 	
-	//index page
-	app.get('/', returnNavigation, function(req, res) {
-		db.collection('tokens').find({"code" :  { $in: ['home-page-finished-projects','home-page-mini-slider','in-case-you-need-any-help', 'home-page-branding-token', 'home-page-develeopment-token', 'home-page-marketing-token', 'home-page-about-us', 'home-page-slider'] } , $or: [ { 'uuid_system' : { $in: [init.system_id] } }, { 'shared_systems': { $in: [init.system_id] } } ]}).toArray(function(err, document) {
-			var resultdata;
-			if(document){
-				resultdata= document;
-			}
-			res.render('index', {
-				homePageTokenData : resultdata,
-      	 		navigation : req.navigation
-       		});
-       	});
-	});
-	
-	app.get('/index', returnNavigation, function(req, res) {
-		db.collection('tokens').find({"code" :  { $in: ['home-page-finished-projects','home-page-mini-slider','in-case-you-need-any-help', 'home-page-branding-token', 'home-page-develeopment-token', 'home-page-marketing-token', 'home-page-about-us', 'home-page-slider'] } , $or: [ { 'uuid_system' : { $in: [init.system_id] } }, { 'shared_systems': { $in: [init.system_id] } } ]}).toArray(function(err, document) {
-			var resultdata;
-			if(document){
-				resultdata= document;
-			}
-			res.render('index', {
-				homePageTokenData : resultdata,
-      	 		navigation : req.navigation
-       		});
-       	});
-	});
-		
-	//signup
-	app.get('/signup', returnNavigation, function(req, res) {
-		res.render('signup', {
-      	 	navigation : req.navigation
-       	});
-	});
-	
-	//tour slider
-	app.get('/tour-slider', function(req, res) {
-		res.render('tour-slider');
-	}); 
-
-	//our clients
-	app.get('/our-clients', returnNavigation, function(req, res) {
-      		db.collection('documents').findOne({"Code" : "our-clients"}, function(err, document) {
-      			if (err) {
-      				res.redirect('/not_found');
-      			}else if(document){
-      				res.render('our-clients', {
-      					resultData : document,
-      	 				navigation :  req.navigation  
-       				});
-       			}else{
-       				res.redirect('/not_found');
-       			}
-			});
-	});
-
-	//search page
-	app.get('/search', returnNavigation, function(req, res) {
-		res.render('search', {
-      		queryString : req.query.s,
-      		navigation : req.navigation  
-    	});
-    });
-
 //unsubscribe
 app.get('/unsubscribe', returnNavigation, function(req, res) {
 	var email_to='', contact_uuid= '', uuid='', unsubscribed=1, status="unsubscribe";
@@ -227,54 +164,6 @@ app.get('/search-results', function(req, res) {
        	});
 	});
 
-//blog page
-	app.get('/blog', returnNavigation, function(req, res) {
-		res.render('posts', {
-      	 	navigation : req.navigation,
-      	 	queryStr : req.query,
-			fetch_type : 'blog'
-       	});
-	});
-
-//news page
-	app.get('/news', returnNavigation, function(req, res) {
-		res.render('posts', {
-      	 	navigation : req.navigation,
-      	 	queryStr : req.query,
-      	 	fetch_type : 'news'
-       	});
-	});
-
-//resource-centre page
-	app.get('/resource-centre', returnNavigation, function(req, res) {
-		res.render('resource-centre', {
-      	 	navigation : req.navigation,
-      	 	queryStr : req.query
-       	});
-	});
-
-
-//contact page
-app.get('/contact', returnNavigation, function(req, res) {
-		db.collection('tokens').findOne({"code" : "contact-page-address", uuid_system : init.system_id}, function(errdoc, addressContent) {
-    		if(addressContent && addressContent!=""){
-    			res.render('contact', {
-      	 			navigation : req.navigation ,
-      	 			address_token: addressContent,
-      	 			queryStr : req.query
-       			});
-       		}else{
-       			db.collection('tokens').findOne({"code" : "contact-page-address", shared_systems : { $in: [init.system_id] }}, function(errdoc, addressContent) {
-       				res.render('contact', {
-      	 				navigation : req.navigation ,
-      	 				address_token: addressContent,
-      	 				queryStr : req.query
-       				});
-    			});
-       		}
-		});
-});
-
 //save contact
 app.post('/contact/save', (req, res) => {
 	var link="/contact";
@@ -368,54 +257,6 @@ app.post('/saveblogcomment', (req, res) => {
   	}
 })
 
-//save wi_users
-app.post('/savewiusers', (req, res) => {
-	var postJson=req.body;
-	postJson.created=currentTimestamp;
-	postJson.modified=currentTimestamp;
-	postJson.status=0;
-	postJson.uuid=guid();
-	var email= postJson.email;
-	var myObj = new Object();
-	if(email!=""){
-		var table_nameStr="wi_users";
-    	db.collection(table_nameStr).findOne({"email" : email}, function(err, existingDocument) {
-			if(existingDocument){
-				myObj["error"]   = "You are already a registered user!";
-				res.send(myObj);
-				
-			}else{
-				
-				db.collection(table_nameStr).save(postJson, (err, result) => {
-    				if(result){
-    					var insertEmail=new Object();
-    					var nameStr=req.body.name;
-    					insertEmail["uuid_system"]=init.system_id;
-						insertEmail["sender_name"]=nameStr;
-						insertEmail["sender_email"]=req.body.email;
-						insertEmail["subject"]=nameStr+" has registered to "+init.system_name;
-						insertEmail["body"]=req.body.comment;
-						insertEmail["created"]=initFunctions.nowTimestamp();
-						insertEmail["modified"]=initFunctions.nowTimestamp();
-						insertEmail["recipient"]=init.recipientStr;
-						insertEmail["status"]=0;
-						db.collection("email_queue").save(insertEmail, (err, e_result) => {
-							myObj["success"]   = "Thank you for registering with us, we will contact you soon!";
-							res.send(myObj);
-						})
-    				}else{
-    					myObj["error"]   = "Error while registration, please try again later!";
-						res.send(myObj);
-    				}
-    			});
-			}	
-  		});	
-  	}else{
-  		myObj["error"]   = "Please specify your email address!";
-		res.send(myObj);
-  	}
-})
-
 // fetch_tokens_content : to fetch tokens content
 app.get('/fetch_tokens_content', function(req, res) {
 	var myObj = new Object();
@@ -433,7 +274,7 @@ app.get('/fetch_tokens_content', function(req, res) {
     }
 });
 
-//content page
+//fetch tweets
 app.get('/fetchTweets', function(req, res) {
 	db.collection('system_lists').findOne({code: "twitter-details"}, function(err, listDetails) {
 		var consumer_key_str = process.env.TWITTER_CONSUMER_KEY;
@@ -477,7 +318,12 @@ app.get('/api_fetch_navigation', returnNavigation, function(req, res) {
 	res.send(req.navigation);
 });
 
-//content page
+//index page
+app.get('/', returnNavigation, function(req, res) {
+	initFunctions.searchForTemplate(db, req.navigation, 'index', res);
+});
+
+//content page or template
 app.get('/:id', returnNavigation, function(req, res) {
       db.collection('documents').findOne({Code: req.params.id, uuid_system : init.system_id}, function(err, document) {
 		if (document) {
@@ -493,7 +339,7 @@ app.get('/:id', returnNavigation, function(req, res) {
        					navigation : req.navigation 
     				});
     			} else {
-       				res.redirect('/not_found');
+       				initFunctions.searchForTemplate(db, req.navigation, req.params.id, res);
     			}
     		});
     	}
