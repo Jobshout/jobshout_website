@@ -5,7 +5,7 @@ if (typeof navigation !== "undefined" && navigation !== null) {
 	for(var tnav=0; tnav<navigation.length; tnav++){
 		if(navigation[tnav].categories=="top-navigation"){
 			if(navigation[tnav].type=="url"){		
-				drawTopNav=' <li><a HREF="'+navigation[tnav].content+'" title="'+navigation[tnav].label+'"><span>'+navigation[tnav].label+'</span></a></li>';
+				drawTopNav+=' <li><a HREF="'+navigation[tnav].content+'" title="'+navigation[tnav].label+'"><span>'+navigation[tnav].label+'</span></a></li>';
 			}else if(navigation[tnav].type=="items"){
 				try{
 					var bookmarkItems = JSON.parse(navigation[tnav].bookmark_items); 
@@ -29,7 +29,7 @@ if (typeof navigation !== "undefined" && navigation !== null) {
 				}
 			}
 		} else if(navigation[tnav].categories=="footer-nav" && navigation[tnav].content!=""){
-			drawFooterNav=' <li><a HREF="'+navigation[tnav].content+'" title="'+navigation[tnav].label+'"><i class="fa fa-angle-right"></i><span>'+navigation[tnav].label+'</span></a></li>';
+			drawFooterNav+=' <li><a HREF="'+navigation[tnav].content+'" title="'+navigation[tnav].label+'"><i class="fa fa-angle-right"></i><span>'+navigation[tnav].label+'</span></a></li>';
 		} 
 	}	
 } 
@@ -39,6 +39,3 @@ pageContentHtml = pageContentHtml.replace("__footerbookmark__", drawFooterNav);
 %>
 
 <%- pageContentHtml %>
-<script>
-
-</script>
