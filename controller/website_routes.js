@@ -93,16 +93,6 @@ app.get('/unsubscribe', returnNavigation, function(req, res) {
     }
 })
 
-//search page
-	app.get('/sitemap', returnNavigation, function(req, res) {
-		db.collection('bookmarks').find({"categories" : "sitemap", "uuid_system" : init.system_id }).toArray(function(err, document) {
-			res.render('sitemap', {
-      	 		resultData : document,
-      	 		navigation : req.navigation 
-       		});
-		});
- 	});
-
 //search results page
 app.get('/search-results', function(req, res) {
 	var myObj = new Object();
@@ -314,6 +304,21 @@ app.get('/fetchTweets', function(req, res) {
 });
 
 //api_fetch_navigation
+app.get('/get_category_lists', returnNavigation, function(req, res) {
+	var responseObj = new Object();
+	if(req.query.category && req.query.category!=""){
+		var catArr = new Array(req.query.category);
+		initFunctions.returnBookmarks(db, catArr, function(resultNav) {
+			responseObj["aaData"]   = resultNav;
+      		res.send(responseObj);
+   		});
+   	}else{
+   		responseObj["error"]   = 'Please pass the category!';
+      	res.send(responseObj);
+   	}
+});
+
+//api_fetch_navigation
 app.get('/api_fetch_navigation', returnNavigation, function(req, res) {
 	res.send(req.navigation);
 });
@@ -347,7 +352,8 @@ app.get('/:id', returnNavigation, function(req, res) {
 });
 
 function returnNavigation (req, res, next) {
-	initFunctions.returnNavigation(db, function(resultNav) {
+	var catArr = new Array('footer-nav', 'top-navigation');
+	initFunctions.returnBookmarks(db, catArr, function(resultNav) {
 		req.navigation=resultNav;
 		next();
    	});

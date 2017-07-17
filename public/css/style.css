@@ -3115,3 +3115,91 @@ line-height: 28px;
     .panel-default > .panel-heading + .panel-collapse > .panel-body {
         border-top-color: #ddd;
     }
+
+h2.site-map-cat-hding {
+	font-weight: 300;
+	font-size: 28px;
+	color: #b9003f;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 15px;
+	padding-bottom: 8px;
+	margin-top: 30px;
+}
+.site-map-list,.site-map-list2  {
+	margin-left: 0px!important;
+	padding-left: 0px!important;
+}
+.site-map-list li a,.site-map-list2 li a {
+	color: #000;
+	float: left;
+	display: inline-block;
+}
+
+.site-map-list li a:hover,.site-map-list2 li a:hover {
+	color: #b9003f;
+	text-decoration: none;
+}
+
+.site-map-cat-hding {
+	font-weight: 600;
+	color: #616161;
+	font-size: 18px;
+	margin-bottom: 15px;
+	margin-top: 0px;
+}
+.site-map-sub-cat-hding {
+	font-weight: 600;
+	color: #e68e03;
+	font-size: 16px;
+	margin-bottom: 15px;
+	padding-top: 0px;
+	margin-left: 7px;
+}
+.site-map-list li,.site-map-list2 li  {
+	float: left;
+	/*padding-left:18px;*/
+	padding-left: 0px;
+	margin-bottom: 8px;
+	padding-right: 2%;
+	display: inline-block;
+	position: relative;
+}
+
+
+@media (min-width:1199px) {
+.site-map-list li {
+	width: 23%;
+}
+}
+
+@media (min-width:992px) and (max-width:1199px) {
+.site-map-list li {
+	width: 31%!important;
+}
+}
+
+@media (min-width:768px) and (max-width:991px) {
+.site-map-list li {
+	width: 50%!important;
+}
+}
+
+@media (max-width:767px) {
+.site-map-list li {
+	width: 100%!important;
+}
+
+}
+
+
+
+@media(min-width:992px){
+.site-map-list2 li {
+	width: 48%;
+}
+}
+@media(max-width:991px){
+.site-map-list2 li {
+	width: 100%;
+}
+}

@@ -36,8 +36,8 @@ var self = module.exports =
 		return timeStampStr;
 	},
 	
-	returnNavigation : function (db, cb){
-		db.collection('bookmarks').find({"uuid_system" : init.system_id, "status": { $in: [ 1, "1" ] } , categories: { $in: [ 'footer-nav', 'top-navigation' ] }}).sort( { order_by_num: 1 } ).toArray(function(err, tokens_result) {
+	returnBookmarks : function (db, categoriesArr, cb){
+		db.collection('bookmarks').find({"uuid_system" : init.system_id, "status": { $in: [ 1, "1" ] } , categories: { $in: categoriesArr }}).sort( { order_by_num: 1 } ).toArray(function(err, tokens_result) {
 			if(err) return cb(null)
 			cb(tokens_result);
 		});
