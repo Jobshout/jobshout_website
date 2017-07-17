@@ -55,7 +55,7 @@ searchForTemplate : function (db, navigationData, req_params_id, res) {
 	db.collection('templates').findOne({code: req_params_id, uuid_system : init.system_id, status: { $in: [ 1, "1" ] } }, function(templateErr, returnTemplateContent) {
 		if (returnTemplateContent) {
       		var templateContentStr = returnTemplateContent.template_content;
-      		self.templateProcessTokens(db, templateContentStr, function(responseStr) {
+      		self.templateProcessTokens(db, templateContentStr, new Array() ,function(responseStr) {
       			res.render('template', {
        				drawTemplate: responseStr,
        				navigation : navigationData
@@ -99,21 +99,35 @@ escapeRegExp : function (str) {
     return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 },
 
-templateProcessTokens : function (db, templateContentStr, cb){
-	var outputResponseStr=templateContentStr;
+templateProcessTokens : function (db, templateContentStr, processedTokenList, cb){
+	var outputResponseStr=templateContentStr, recursionOccurredToken='';
 	var listOfTokensStr= self.findTokensListInTemplate(outputResponseStr);
     if(listOfTokensStr!=""){
     	var tokensArr = listOfTokensStr.split(',');
+    	if(tokensArr.length>0 && processedTokenList.length>0){
+    		for(var i=0; i < tokensArr.length; i++){
+    			if(processedTokenList.indexOf(tokensArr[i]) > -1){
+    				recursionOccurredToken = tokensArr[i];
+    				var recursionErrMsg="<b>*** Recursion '"+recursionOccurredToken+"' ***</b>";
+    				var foundTokenStr = self.escapeRegExp("<*--"+tokensArr[i]+"--*>");
+      				outputResponseStr=outputResponseStr.replace(new RegExp(foundTokenStr, 'g'), recursionErrMsg);
+      				tokensArr.splice(i, 1);
+    				
+    			}
+    		}
+    	}
+    	
       	db.collection('tokens').find({ 'code': { $in: tokensArr }, status: { $in: [ 1, "1" ] }, uuid_system : init.system_id }, {'code' : 1,'token_content' : 1}).toArray(function(tokensErr, tokensResult) {
     		if (tokensResult && tokensResult.length>0){
       			for(var j=0; j<tokensResult.length; j++){
       				var foundTokenStr = self.escapeRegExp("<*--"+tokensResult[j].code+"--*>");
+      				processedTokenList.push(tokensResult[j].code);
       				outputResponseStr=outputResponseStr.replace(new RegExp(foundTokenStr, 'g'), tokensResult[j].token_content);
       			}
       			if(outputResponseStr==templateContentStr){
       				cb(outputResponseStr);
       			}else{
-      				self.templateProcessTokens(db, outputResponseStr, function(responseStr) {
+      				self.templateProcessTokens(db, outputResponseStr, processedTokenList, function(responseStr) {
       					cb(responseStr);
 					});
 				}
@@ -121,6 +135,7 @@ templateProcessTokens : function (db, templateContentStr, cb){
       			db.collection('tokens').find({ 'code': { $in: tokensArr }, status: { $in: [ 1, "1" ] }, shared_systems : { $in: [init.system_id] } }, {'code' : 1,'token_content' : 1}).toArray(function(tokensErr, tokensResult) {
     				if (tokensResult && tokensResult.length>0){
       					for(var j=0; j<tokensResult.length; j++){
+      						processedTokenList.push(tokensResult[j].code);
       						var foundTokenStr = self.escapeRegExp("<*--"+tokensResult[j].code+"--*>");
       						outputResponseStr=outputResponseStr.replace(new RegExp(foundTokenStr, 'g'), tokensResult[j].token_content);
       					}
@@ -128,7 +143,7 @@ templateProcessTokens : function (db, templateContentStr, cb){
       				if(outputResponseStr==templateContentStr){
       					cb(outputResponseStr);
       				}else{
-      					self.templateProcessTokens(db, outputResponseStr, function(responseStr) {
+      					self.templateProcessTokens(db, outputResponseStr, processedTokenList, function(responseStr) {
       						cb(responseStr);
 						});
 					}
