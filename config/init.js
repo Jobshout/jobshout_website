@@ -17,12 +17,12 @@
 	
 	// Connection URL. This is where your mongodb server is running.
 	var url = 'mongodb://localhost:27017/jobshout_live';
-	var _db;
+	
 	module.exports = {
     	mongodb : mongodbRe,
     	MongoClient : MongoClient,
     	mongoConnUrl : url,
-    	port : 3004,
+    	port : 3004, //default port
     	recipientStr : 'bwalia@tenthmatrix.co.uk',
     	system_name : "Jobshout Website",
     	websiteUrl : 'http://www.jobshout.com',
