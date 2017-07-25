@@ -16,7 +16,7 @@ var initFunctions = require('../config/functions');
 
 module.exports = function(init, app, db){
 	var mongodb=init.mongodb;
-	
+	var navigationCategoriesArr = new Array('footer-nav', 'top-navigation');
 //unsubscribe
 app.get('/unsubscribe', returnNavigation, function(req, res) {
 	var email_to='', contact_uuid= '', uuid='', unsubscribed=1, status="unsubscribe";
@@ -113,7 +113,7 @@ app.get('/search-results', function(req, res) {
 		var regex = new RegExp(searchStr, "i");
 		
 		if(type=="site"){
-			query= '{'
+			query= '{ "status": { $in: [ 1, "1" ]},'
 		}else{
 			query= '{ "Type" : "'+type+'", "status": { $in: [ 1, "1" ] },  ';
 		}
@@ -304,11 +304,11 @@ app.get('/fetchTweets', function(req, res) {
 });
 
 //api_fetch_navigation
-app.get('/get_category_lists', returnNavigation, function(req, res) {
+app.get('/get_category_lists', function(req, res) {
 	var responseObj = new Object();
 	if(req.query.category && req.query.category!=""){
 		var catArr = new Array(req.query.category);
-		initFunctions.returnBookmarks(db, catArr, function(resultNav) {
+		initFunctions.returnBookmarks(db, catArr, new Array(), false, function(resultNav) {
 			responseObj["aaData"]   = resultNav;
       		res.send(responseObj);
    		});
@@ -324,27 +324,31 @@ app.get('/api_fetch_navigation', returnNavigation, function(req, res) {
 });
 
 //index page
-app.get('/', returnNavigation, function(req, res) {
-	initFunctions.searchForTemplate(db, req.navigation, 'index', res);
+app.get('/', function(req, res) {
+	initFunctions.searchForTemplate(db, 'index', res, navigationCategoriesArr);
 });
 
 //content page or template
-app.get('/:id', returnNavigation, function(req, res) {
+app.get('/:id', function(req, res) {
       db.collection('documents').findOne({Code: req.params.id, uuid_system : init.system_id}, function(err, document) {
 		if (document) {
-			res.render('content', {
-       			document_details: document,
-       			navigation : req.navigation 
+			initFunctions.returnBookmarks(db, navigationCategoriesArr, document.tags, true, function(resultNav) {
+				res.render('content', {
+       				document_details: document,
+       				navigation : resultNav 
+    			});
     		});
     	} else {
     		db.collection('documents').findOne({Code: req.params.id, shared_systems : { $in: [init.system_id] }}, function(err, document) {
 				if (document) {
-					res.render('content', {
-       					document_details: document,
-       					navigation : req.navigation 
+					initFunctions.returnBookmarks(db, navigationCategoriesArr, document.tags, true, function(resultNav) {
+						res.render('content', {
+       						document_details: document,
+       						navigation : resultNav 
+       					});
     				});
     			} else {
-       				initFunctions.searchForTemplate(db, req.navigation, req.params.id, res);
+       				initFunctions.searchForTemplate(db, req.params.id, res, navigationCategoriesArr);
     			}
     		});
     	}
@@ -352,8 +356,7 @@ app.get('/:id', returnNavigation, function(req, res) {
 });
 
 function returnNavigation (req, res, next) {
-	var catArr = new Array('footer-nav', 'top-navigation');
-	initFunctions.returnBookmarks(db, catArr, function(resultNav) {
+	initFunctions.returnBookmarks(db, navigationCategoriesArr, new Array(), true, function(resultNav) {
 		req.navigation=resultNav;
 		next();
    	});

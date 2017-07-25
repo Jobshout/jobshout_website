@@ -36,11 +36,39 @@ var self = module.exports =
 		return timeStampStr;
 	},
 	
-	returnBookmarks : function (db, categoriesArr, cb){
-		db.collection('bookmarks').find({"uuid_system" : init.system_id, "status": { $in: [ 1, "1" ] } , categories: { $in: categoriesArr }}).sort( { order_by_num: 1 } ).toArray(function(err, tokens_result) {
-			if(err) return cb(null)
-			cb(tokens_result);
-		});
+	returnBookmarks : function (db, catArr, tagsArr, defaultbool, cb){
+		if(defaultbool==true || defaultbool=="true")	{
+			if(tagsArr && tagsArr.length>0){
+				var formTagsStr= "";
+				for(var i=0; i < tagsArr.length; i++){
+					formTagsStr+= ' "'+tagsArr[i]+'" ';
+				}
+				db.collection('bookmarks').find({"uuid_system" : init.system_id, "status": { $in: [ 1, "1" ] } , "categories": { $in: catArr }, $text: { $search: formTagsStr }}).sort( { order_by_num: 1 } ).toArray(function(err, tokens_result) {
+					if(err) {
+						return cb(null);
+					} else {
+						if(tokens_result && tokens_result.length>0){
+							cb(tokens_result);
+						} else	{
+							db.collection('bookmarks').find({"uuid_system" : init.system_id, "status": { $in: [ 1, "1" ] } , "default": { $in: [ 1, "1" ] } , "categories": { $in: catArr }}).sort( { order_by_num: 1 } ).toArray(function(err1, tokens_result1) {
+								if(err1) return cb(null)
+								cb(tokens_result1);
+							});
+						}
+					}
+				});
+			}	else {
+				db.collection('bookmarks').find({"uuid_system" : init.system_id, "status": { $in: [ 1, "1" ] } , "default": { $in: [ 1, "1" ] } , "categories": { $in: catArr }}).sort( { order_by_num: 1 } ).toArray(function(err, tokens_result) {
+					if(err) return cb(null)
+					cb(tokens_result);
+				});
+			}
+		}	else	{
+			db.collection('bookmarks').find({"uuid_system" : init.system_id, "status": { $in: [ 1, "1" ] } , "categories": { $in: catArr }}).sort( { order_by_num: 1 } ).toArray(function(err, tokens_result) {
+				if(err) return cb(null)
+				cb(tokens_result);
+			});
+		}
 	},
 	guid : function () {
   		function s4() {
@@ -51,14 +79,16 @@ var self = module.exports =
   		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	},
 	
-searchForTemplate : function (db, navigationData, req_params_id, res) {
+searchForTemplate : function (db, req_params_id, res, navigationCategoriesArr) {
 	db.collection('templates').findOne({code: req_params_id, uuid_system : init.system_id, status: { $in: [ 1, "1" ] } }, function(templateErr, returnTemplateContent) {
 		if (returnTemplateContent) {
-      		var templateContentStr = returnTemplateContent.template_content;
+			var templateContentStr = returnTemplateContent.template_content;
       		self.templateProcessTokens(db, templateContentStr, new Array() ,function(responseStr) {
-      			res.render('template', {
-       				drawTemplate: responseStr,
-       				navigation : navigationData
+      			self.returnBookmarks(db, navigationCategoriesArr, returnTemplateContent.tags, true, function(resultNav) {
+      				res.render('template', {
+       					drawTemplate: responseStr,
+       					navigation : resultNav
+    				});
     			});
 			});
     	} else {
