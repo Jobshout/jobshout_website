@@ -13,9 +13,12 @@
 	**/
 	
 var initFunctions = require('../config/functions');	
+var Grid = require('gridfs-stream');
 
 module.exports = function(init, app, db){
 	var mongodb=init.mongodb;
+	var gfs = Grid(db, mongodb);
+	
 	var navigationCategoriesArr = new Array('footer-nav', 'top-navigation');
 //unsubscribe
 app.get('/unsubscribe', returnNavigation, function(req, res) {
@@ -328,6 +331,29 @@ app.get('/', function(req, res) {
 	initFunctions.searchForTemplate(db, 'index', res, navigationCategoriesArr);
 });
 
+//fetch uploaded file content
+app.get('/file/:filename', function(req, res){
+        /** First check if file exists */
+        gfs.files.find({'metadata.uuid': req.params.filename}).toArray(function(err, files){
+            if(!files || files.length === 0){
+                return res.status(404).json({
+                    responseCode: 1,
+                    responseMessage: "error"
+                });
+            }
+
+            /** create read stream */
+            var readstream = gfs.createReadStream({
+            	filename: files[0].filename
+            });
+
+            /** set the proper content type */
+            res.set('Content-Type', files[0].contentType)                                                                                                                      
+
+            /** return response */
+            return readstream.pipe(res);
+        });
+});
 //content page or template
 app.get('/:id', function(req, res) {
       db.collection('documents').findOne({Code: req.params.id, uuid_system : init.system_id}, function(err, document) {
