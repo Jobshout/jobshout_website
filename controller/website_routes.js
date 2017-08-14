@@ -163,7 +163,7 @@ app.post('/contact/save', (req, res) => {
 	var postJson=req.body;
 	postJson.created=initFunctions.nowTimestamp();
 	postJson.uuid_system=init.system_id;
-    db.collection("contacts").save(postJson, (err, result) => {
+    db.collection("website_enquiries").save(postJson, (err, result) => {
 		if (err){
     		link+="?error=Sorry, some problem occurred while submitting your request!";
     		res.redirect(link)
