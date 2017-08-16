@@ -159,7 +159,7 @@ app.get('/search-results', function(req, res) {
 
 //save contact
 app.post('/contact/save', (req, res) => {
-	var link="/contact";
+	var link="/contact-us";
 	var postJson=req.body;
 	postJson.created=initFunctions.nowTimestamp();
 	postJson.uuid_system=init.system_id;
