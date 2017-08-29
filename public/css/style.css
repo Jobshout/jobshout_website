@@ -3070,6 +3070,16 @@ border-radius: 3px;
 color: #fffffe;
 }
 
+.content h4 a{
+	color:#fff!important;
+	text-decoration:underline!important;
+}
+
+.content h4 a:hover{
+	color:rgba(229,226,227,1.00);
+	
+}
+
 .content ul{
 padding-left: 14px;
 }
