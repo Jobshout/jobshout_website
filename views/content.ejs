@@ -55,7 +55,7 @@ metaDescriptionStr= document_details.MetaTagDescription;
                				<div class="st-view text-right">
                   				<ul class="list-unstyled">
                     				<li>
-                      					<a href="javascript:void(0);"><% if(document_details.Objects.length>=1) { %><%= document_details.Objects.length %> comment(s)<% } else{ %>No comment<% } %></a>
+                      					<a href="javascript:void(0);"><% if(document_details.BlogComments && document_details.BlogComments.length>=1) { %><%= document_details.BlogComments.length %> comment(s)<% } else{ %>No comment<% } %></a>
                     				</li>
                   				</ul>
                 			</div>
